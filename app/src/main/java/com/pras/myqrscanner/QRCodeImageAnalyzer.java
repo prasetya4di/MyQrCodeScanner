@@ -45,7 +45,7 @@ public class QRCodeImageAnalyzer implements ImageAnalysis.Analyzer {
 
             try {
                 Result result = new QRCodeMultiReader().decode(binaryBitmap);
-                listener.onQRCoeFound(result.getText());
+                listener.onQRCodeFound(result.getText());
             } catch (FormatException | ChecksumException | NotFoundException e) {
                 listener.qrCodeNotFound();
             }
