@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,7 +17,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -98,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         preview.setSurfaceProvider(cameraView.getSurfaceProvider());
 
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                .setTargetResolution(new Size(1280, 720))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 
@@ -115,6 +112,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }));
 
-        cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview);
+        cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis, preview);
     }
 }
