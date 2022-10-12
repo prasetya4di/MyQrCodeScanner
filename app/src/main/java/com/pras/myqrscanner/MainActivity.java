@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CAMERA = 0;
     private PreviewView cameraView;
+    private ProcessCameraProvider processCameraProvider;
     private ListenableFuture<ProcessCameraProvider> cameraProvider;
 
     private Button qrCodeFoundButton;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         qrCodeFoundButton.setVisibility(View.INVISIBLE);
         qrCodeFoundButton.setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
+            processCameraProvider.unbindAll();
             Log.i(MainActivity.class.getSimpleName(), "QR Code Found: " + qrCode);
         });
 
@@ -76,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
     private void startCamera() {
         cameraProvider.addListener(() -> {
             try {
-                ProcessCameraProvider cameraProvider = this.cameraProvider.get();
-                bindCameraPreview(cameraProvider);
+                processCameraProvider = this.cameraProvider.get();
+                bindCameraPreview(processCameraProvider);
             } catch (ExecutionException | InterruptedException e) {
                 Toast.makeText(this, "Error starting camera " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
