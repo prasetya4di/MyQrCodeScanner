@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">MyQrScanner</string>
     <string name="qr_code_found_text">QR Code Found</string>
+    <string name="result_phone_number_message">Apakah anda ingin menghubungi nomor telp ini ?</string>
+    <string name="result_email_message">Apakah anda ingin mengirimkan pesan ke email tersebut ?</string>
+    <string name="result_web_message">Apakah anda ingin membuka alamat URL tersebut ?</string>
+    <string name="result_location_message">Apakah anda ingin mencari lokasi ini di Google Maps ?</string>
+    <string name="result_product_message">Apakah anda ingin mencari produk ini di browser ?</string>
+    <string name="result_code_message">Sebarkan kode/nomor ini melalui : </string>
 </resources>
