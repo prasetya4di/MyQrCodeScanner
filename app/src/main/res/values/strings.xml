@@ -11,4 +11,5 @@
     <string name="result_type_text">Tipe</string>
     <string name="dialog_button_yes">Ya</string>
     <string name="dialog_button_no">Tidak</string>
+    <string name="dialog_button_close">Tutup</string>
 </resources>
