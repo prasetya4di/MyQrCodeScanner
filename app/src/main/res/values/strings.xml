@@ -7,4 +7,6 @@
     <string name="result_location_message">Apakah anda ingin mencari lokasi ini di Google Maps ?</string>
     <string name="result_product_message">Apakah anda ingin mencari produk ini di browser ?</string>
     <string name="result_code_message">Sebarkan kode/nomor ini melalui : </string>
+    <string name="data_qr_text">Data QR</string>
+    <string name="result_type_text">Tipe</string>
 </resources>
