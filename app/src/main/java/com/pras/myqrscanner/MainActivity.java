@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     dialog.dismiss();
                     startCamera();
                 });
+        builder.setCancelable(false);
         builder.show();
     }
 
@@ -162,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     dialog.dismiss();
                     startCamera();
                 });
+        builder.setCancelable(false);
         builder.show();
     }
 
