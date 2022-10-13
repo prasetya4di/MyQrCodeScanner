@@ -7,10 +7,10 @@ import android.net.Uri;
 import java.util.regex.Pattern;
 
 public enum ResultType {
-    PHONE_NUMBER("Telp", "^\\+[1-9]{1}[0-9]{3,14}$", R.string.result_phone_number_message) {
+    PHONE_NUMBER("Telp", "^(tel:)\\+[1-9]{1}[0-9]{3,14}$", R.string.result_phone_number_message) {
         @Override
         public Intent intentResult(String result) {
-            Uri phoneNumber = Uri.parse("tel:" + result);
+            Uri phoneNumber = Uri.parse(result);
             return new Intent(Intent.ACTION_DIAL, phoneNumber);
         }
     },
@@ -22,17 +22,17 @@ public enum ResultType {
             return emailIntent;
         }
     },
-    WEB("WEB", "^(http|https):\\/\\/(www).([a-z\\.]*)?(\\/[a-z1-9\\/]*)*\\??([\\&a-z1-9=]*)?", R.string.result_web_message) {
+    WEB("WEB", "^(http|https):\\/\\/([a-z\\.]*)?(\\/[a-z1-9\\/]*)*\\??([\\&a-z1-9=]*)?", R.string.result_web_message) {
         @Override
         public Intent intentResult(String result) {
             Uri webpage = Uri.parse(result);
             return new Intent(Intent.ACTION_VIEW, webpage);
         }
     },
-    LOCATION("Lokasi", "([+-]?\\d+\\.?\\d+)\\s*,\\s*([+-]?\\d+\\.?\\d+)", R.string.result_location_message) {
+    LOCATION("Lokasi", "geo:([+-]?\\d+\\.?\\d+)\\s*,\\s*([+-]?\\d+\\.?\\d+).", R.string.result_location_message) {
         @Override
         public Intent intentResult(String result) {
-            Uri location = Uri.parse("geo:" + result);
+            Uri location = Uri.parse(result);
             return new Intent(Intent.ACTION_VIEW, location);
         }
     },
@@ -65,7 +65,7 @@ public enum ResultType {
 
     public static ResultType parse(String value) {
         for (ResultType resultType : values()) {
-            if (Pattern.matches(resultType.regex, value)) {
+            if (Pattern.compile(resultType.regex).matcher(value).find()) {
                 return resultType;
             }
         }
