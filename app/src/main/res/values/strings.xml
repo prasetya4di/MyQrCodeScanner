@@ -9,4 +9,6 @@
     <string name="result_code_message">Sebarkan kode/nomor ini melalui : </string>
     <string name="data_qr_text">Data QR</string>
     <string name="result_type_text">Tipe</string>
+    <string name="dialog_button_yes">Ya</string>
+    <string name="dialog_button_no">Tidak</string>
 </resources>
