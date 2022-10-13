@@ -1,14 +1,19 @@
 package com.pras.myqrscanner;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -29,23 +34,12 @@ public class MainActivity extends AppCompatActivity {
     private ProcessCameraProvider processCameraProvider;
     private ListenableFuture<ProcessCameraProvider> cameraProvider;
 
-    private Button qrCodeFoundButton;
-    private String qrCode;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         cameraView = findViewById(R.id.mainCameraView);
-        qrCodeFoundButton = findViewById(R.id.qrCodeFoundButton);
-
-        qrCodeFoundButton.setVisibility(View.INVISIBLE);
-        qrCodeFoundButton.setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
-            processCameraProvider.unbindAll();
-            Log.i(MainActivity.class.getSimpleName(), "QR Code Found: " + qrCode);
-        });
 
         cameraProvider = ProcessCameraProvider.getInstance(this);
         requestCamera();
@@ -103,17 +97,91 @@ public class MainActivity extends AppCompatActivity {
 
         imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), new QRCodeImageAnalyzer(new QRCodeFoundListener() {
             @Override
-            public void onQRCodeFound(String _qrCode) {
-                qrCode = _qrCode;
-                qrCodeFoundButton.setVisibility(View.VISIBLE);
+            public void onQRCodeFound(String result) {
+                showAlertDialog(result);
+                cameraProvider.unbindAll();
             }
 
             @Override
             public void qrCodeNotFound() {
-                qrCodeFoundButton.setVisibility(View.INVISIBLE);
+                Log.d("Scan result", "Qr code not found");
             }
         }));
 
         cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis, preview);
+    }
+
+    private void showAlertDialog(String result) {
+        ResultType resultType = ResultType.parse(result);
+
+        if (resultType == ResultType.CODE) {
+            showCodeTypeDialog(result, resultType);
+        } else {
+            showResultDialog(result, resultType);
+        }
+    }
+
+    private void showCodeTypeDialog(String result, @NonNull ResultType resultType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View resultNumberLayout = inflater.inflate(R.layout.result_number_dialog, null);
+        TextView tvResult = resultNumberLayout.findViewById(R.id.tvQrResult);
+        TextView tvType = resultNumberLayout.findViewById(R.id.tvQrType);
+        ImageView fbShare = resultNumberLayout.findViewById(R.id.facebookButton);
+        ImageView twitterShare = resultNumberLayout.findViewById(R.id.twitterButton);
+        ImageView whatsappShare = resultNumberLayout.findViewById(R.id.whatsappButton);
+        fbShare.setOnClickListener(v -> shareToOtherApp(result, "com.facebook.katana"));
+        twitterShare.setOnClickListener(v -> shareToOtherApp(result, "com.twitter.android"));
+        whatsappShare.setOnClickListener(v -> shareToOtherApp(result, "com.whatsapp"));
+        tvResult.setText(result);
+        tvType.setText(resultType.typeName);
+        builder.setView(resultNumberLayout)
+                .setNegativeButton(R.string.dialog_button_close, (dialog, which) -> {
+                    dialog.dismiss();
+                    startCamera();
+                });
+        builder.show();
+    }
+
+    private void showResultDialog(String result, @NonNull ResultType resultType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View resultDialogLayout = inflater.inflate(R.layout.result_dialog, null);
+        TextView tvResult = resultDialogLayout.findViewById(R.id.tvQrResult);
+        TextView tvType = resultDialogLayout.findViewById(R.id.tvQrType);
+        TextView tvMessage = resultDialogLayout.findViewById(R.id.resultMessage);
+        tvResult.setText(result);
+        tvType.setText(resultType.typeName);
+        tvMessage.setText(getString(resultType.messageId));
+        builder.setView(resultDialogLayout)
+                .setPositiveButton(R.string.dialog_button_yes, (dialog, which) -> {
+                    startActivity(resultType.intentResult(result));
+                    startCamera();
+                })
+                .setNegativeButton(R.string.dialog_button_no, (dialog, which) -> {
+                    dialog.dismiss();
+                    startCamera();
+                });
+        builder.show();
+    }
+
+    private void shareToOtherApp(String content, String packageName) {
+        Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
+        if (intent != null) {
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.setPackage(packageName);
+
+            shareIntent.putExtra(android.content.Intent.EXTRA_TITLE, "Coba title aja hehehehe");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, content);
+            // Start the specific social application
+            startActivity(shareIntent);
+        } else {
+            String playStoreUrl = "http://play.google.com/store/apps/details?id=" + packageName;
+            Intent playStoreIntent = new Intent(Intent.ACTION_VIEW);
+            playStoreIntent.setData(Uri.parse(playStoreUrl));
+            startActivity(playStoreIntent);
+        }
+        startCamera();
     }
 }
